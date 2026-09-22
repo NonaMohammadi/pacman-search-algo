@@ -113,12 +113,44 @@ def depthFirstSearch(problem):
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
+    border = util.Stack()
+    border.push((problem.getStartState(), []))
+    visited = set()
+
+    while not border.isEmpty():
+        current_state, actions = border.pop()
+
+        if problem.isGoalState(current_state):
+            return actions
+
+        if current_state not in visited:
+            visited.add(current_state)
+            for next_state, action, cost in problem.expand(current_state):
+                if next_state not in visited:
+                    new_actions = actions + [action]
+                    border.push((next_state, new_actions))
+    return []
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
+    border = util.Queue()
+    border.push((problem.getStartState(), []))
+    visited = set()
+
+    while not border.isEmpty():
+        current_state, actions = border.pop()
+
+        if problem.isGoalState(current_state):
+            return actions
+
+        if current_state not in visited:
+            visited.add(current_state)
+            for next_state, action, cost in problem.expand(current_state):
+                if next_state not in visited:
+                    new_actions = actions + [action]
+                    border.push((next_state, new_actions))
+    return []
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -130,7 +162,27 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
+    border = util.PriorityQueue()
+    start_state = problem.getStartState()
+    border.push((start_state, []), heuristic(start_state, problem))
+    visited = {} 
+
+    while not border.isEmpty():
+        current_state, actions = border.pop()
+
+        if problem.isGoalState(current_state):
+            return actions
+
+        current_cost = problem.getCostOfActionSequence(actions)
+
+        if current_state not in visited or visited[current_state] > current_cost:
+            visited[current_state] = current_cost
+            for next_state, action, cost in problem.expand(current_state):
+                new_actions = actions + [action]
+                new_cost = problem.getCostOfActionSequence(new_actions)
+                total_cost = new_cost + heuristic(next_state, problem)
+                border.push((next_state, new_actions), total_cost)
+    return []
     util.raiseNotDefined()
 
 
